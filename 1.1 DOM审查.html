@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>own react</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script>
+    // 获取 root 元素
+    const domRoot = document.getElementById("root");
+    // 创建一个元素
+    const domInput = document.createElement("input");
+    // 设置元素属性
+    domInput["type"] = "text";
+    domInput["value"] = "hello react";
+    domInput["calssName"] = "my-class";
+    // 监听元素事件
+    domInput.addEventListener("change", e => alert(e.target.value));
+    // 创建一个文本节点 createTextNode只是纯粹创造了文本节点，所以返回的效果也就是纯文本内容。
+    const domText = document.createTextNode("");
+    // 给文本节点添加内容
+    domText["nodeValue"] = "Text";
+    // 给 root 元素添加 input 元素
+    domRoot.appendChild(domInput);
+    // 给 root 元素添加 文本
+    domRoot.appendChild(domText);
+  </script>
+</body>
+
+</html>
