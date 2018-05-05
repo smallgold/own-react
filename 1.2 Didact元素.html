@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>own react</title>
+</head>
+
+<body>
+<p>我们将使用普通的JS对象来描述需要渲染的东西。我们将它们称为Didact Elements。</p>
+
+<p>这些元素有两个必需的属性：type和props。</p>
+
+<p>type可以是一个**{字符串string}或一个{函数function}**, 但我们将只使用-字符串-，直到我们在稍后的帖子中引入-组件-。</p>
+
+<p>props是可以为空的对象（但不为空）。props可能有一个children属性，它应该是一个Didact元素的数组。</p>
+
+<p>我们会很多地使用Didact Elements，所以从现在开始我们只会称它们为**{元素element}**, 不要与HTML element混淆.</p>
+
+<p>例如，像这样的一个元素：</p>
+<pre>
+    const element = {
+      type: "div",
+      props: {
+        id: "container",
+        children: [
+          { type: "input", props: { value: "foo", type: "text" } },
+          { type: "a", props: { href: "/bar" } },
+          { type: "span", props: {} }
+        ]
+      }
+    };
+</pre>
+<p>描述这个dom:</p>
+<pre>
+  &lt;<span>div</span> <span>id</span>=<span><span>"</span>container<span>"</span></span>&gt;
+    &lt;<span>input</span> <span>value</span>=<span><span>"</span>foo<span>"</span></span> <span>type</span>=<span><span>"</span>text<span>"</span></span>&gt;
+    &lt;<span>a</span> <span>href</span>=<span><span>"</span>/bar<span>"</span></span>&gt;&lt;/<span>a</span>&gt;
+    &lt;<span>span</span>&gt;&lt;/<span>span</span>&gt;
+  &lt;/<span>div</span>&gt;
+</pre>
+<p>Didact-元素与React-元素非常相似。</p>
+
+<p>但是通常你在使用React时不会创建React-元素作为JS对象，</p>
+
+<p>你可能使用JSX或者甚至是createElement。</p>
+
+<p>我们将在Didact中做同样的事情，但我们将会在系列下一篇文章中描述-createElement-的代码。</p>
+</body>
+
+</html>
