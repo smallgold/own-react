@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>own react</title>
+</head>
+
+<body>
+  <p>下一步是将元素及其子元素呈现给dom。 我们将使用一个render函数（相当于ReactDOM.render）接收一个元素和一个dom容器。 该函数应该创建由element定义的dom子树并将其附加到容器中：</p>
+  <pre>
+        function render(element, parentDom) {
+          const { type, props } = element; // 获取类型 和 属性对象
+          const dom = document.createElement(type); // 创建-类型-元素
+          const childElements = props.children || []; // 获取-子元素
+          childElements.forEach(childElement => render(childElement, dom)); // 递归子元素 将子元素加入当前元素中;
+          // 
+          parentDom.appendChild(dom); // 将当前元素集合加入父级元素;
+        }
+    </pre> 我们仍然缺少属性和事件监听器。让我们props用Object.keys函数迭代属性名称并相应地-设置-它们：
+  <pre>
+        function render(element, parentDom) {
+          const { type, props } = element;
+          const dom = document.createElement(type);
+        
+          const isListener = name => name.startsWith("on");
+          // 判断开头是否为on; 事件监听器;
+          Object.keys(props).filter(isListener).forEach(name => {
+            const eventType = name.toLowerCase().substring(2); // 取两位后
+            // 监听每一个开头为 on 的函数属性 并激活 props[name] 函数
+            dom.addEventListener(eventType, props[name]);
+          });
+        
+          // 判断 props 的值不为监听事件和子元素;
+          const isAttribute = name => !isListener(name) && name != "children";
+        
+          Object.keys(props).filter(isAttribute).forEach(name => {
+            dom[name] = props[name];
+          });
+          // 过滤出来的属性赋值于 dom
+          const childElements = props.children || [];
+          childElements.forEach(childElement => render(childElement, dom));
+        
+          parentDom.appendChild(dom);
+        }
+    </pre>
+  <script>
+    function render(element, parentDom) {
+      const { type, props } = element; // 获取类型 和 属性对象
+      const dom = document.createElement(type); // 创建-类型-元素
+      const isListener = name => name.startWidth("on"); // 判断开头是否为on; 事件监听器;
+      Object.keys(props).filter(isListener).forEach(name => {
+        const eventType = name.toLocaleLowerCase().substring(2); // 取两位后
+        // 监听每一个开头为 on 的函数属性 并激活 props[name] 函数
+        dom.addEventListener(eventType, props[name])
+      })
+      // 判断 props 的值不为监听事件和子元素;
+      const isAttribute = name => !isListener(name) && name != "children";
+      // 过滤出来的属性赋值于 dom
+      Object.keys(props).filter(isAttribute).forEach(name => {
+        dom[name] = props[name];
+      });
+
+      const childElements = porps.children || []; // 获取-子元素
+      childElements.forEach(childElement => { render(childElement, dom); }) // 递归子元素 将子元素加入当前元素中;
+      parentDom.appendChild(dom) // 将当前元素集合加入父级元素;
+    }
+  </script>
+</body>
+
+</html>
