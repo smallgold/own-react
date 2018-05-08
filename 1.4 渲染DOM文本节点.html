@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>own react</title>
+</head>
+
+<body>
+  <p>render函数不支持的一件事是文本节点。首先，我们需要定义文本元素的外观。例如，<span>Foo</span>在React中描述的元素如下所示：</p>
+  <pre>
+      const reactElement = {
+        type: "span",
+        props: {
+          children: ["Foo"] // 是子元素, 但也只是一个字符串
+        }
+      };
+  </pre>
+  <p>请注意，children，只是一个字符串 ，而不是另一个元素对象。</p>
+
+  <p>这违背了我们如何定义Didact元素：children应该是元素的数组和所有元素应该有type和props。</p>
+
+  <p>如果我们遵循这些规则，我们将来会少一些if判断。</p>
+
+  <p>因此，Didact Text Elements将type==“TEXT ELEMENT”相等，实际文本将位于nodeValue属性中。</p>
+
+  <p>像这个：</p>
+  <pre>
+      const textElement = {
+        type: "span",
+        props: {
+          children: [
+            {
+              type: "TEXT ELEMENT", // 1
+              props: { nodeValue: "Foo" } // 2
+            }
+          ]
+        }
+      };
+  </pre>
+  <p>现在我们已经规范了文本元素的数据结构，我们需要可以呈现它, 以便与其他元素一样，而区别也就是{type: "TEXT ELEMENT"}。</p>
+
+  <p>我们应该使用createTextNode，而不是使用createElement。</p>
+
+  <p>就是这样，nodeValue将会像其他属性一样设置。</p>
+  <pre>
+      function render(element, parentDom) {
+        const { type, props } = element;
+      
+        // Create DOM element
+        const isTextElement = type === "TEXT ELEMENT"; // 文本类型判定
+        const dom = isTextElement
+          ? document.createTextNode("")
+          : document.createElement(type);
+      
+        // Add event listeners
+        const isListener = name => name.startsWith("on");
+        Object.keys(props).filter(isListener).forEach(name => {
+          const eventType = name.toLowerCase().substring(2);
+          dom.addEventListener(eventType, props[name]);
+        });
+      
+        // Set properties
+        const isAttribute = name => !isListener(name) && name != "children";
+        Object.keys(props).filter(isAttribute).forEach(name => {
+          dom[name] = props[name];
+        });
+      
+        // Render children
+        const childElements = props.children || [];
+        childElements.forEach(childElement => render(childElement, dom));
+      
+        // Append to parent
+        parentDom.appendChild(dom);
+      }
+  </pre>
+  <script>
+    function render(element, parentDom) {
+      const { type, props } = element; // 获取类型 和 属性对象
+      const dom = document.createElement(type); // 创建-类型-元素
+      const isListener = name => name.startWidth("on"); // 判断开头是否为on; 事件监听器;
+      Object.keys(props).filter(isListener).forEach(name => {
+        const eventType = name.toLocaleLowerCase().substring(2); // 取两位后
+        // 监听每一个开头为 on 的函数属性 并激活 props[name] 函数
+        dom.addEventListener(eventType, props[name])
+      })
+      // 判断 props 的值不为监听事件和子元素;
+      const isAttribute = name => !isListener(name) && name != "children";
+      // 过滤出来的属性赋值于 dom
+      Object.keys(props).filter(isAttribute).forEach(name => {
+        dom[name] = props[name];
+      });
+
+      const childElements = porps.children || []; // 获取-子元素
+      childElements.forEach(childElement => { render(childElement, dom); }) // 递归子元素 将子元素加入当前元素中;
+      parentDom.appendChild(dom) // 将当前元素集合加入父级元素;
+    }
+  </script>
+</body>
+
+</html>
