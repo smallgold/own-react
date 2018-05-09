@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>own react</title>
+</head>
+
+<body>
+  <p>我们创建了一个render函数，允许我们将一个元素{element}及其子元素{children}呈现给-DOM「parentDom.appendChild(dom);」。</p>
+  <p>接下来我们需要的是createElement的简单方法。</p>
+  <p>我们将在下一篇文章中做到这一点，在那里我们将让JSX与Didact一起工作。</p>
+  <div id="root"></div>
+  <script>
+    const Didact = importFromBelow();
+    const stories = [
+      { name: "Didact introduction", url: "https://github.com/chinanf-boy/didact-explain" },
+      { name: "Rendering DOM elements ", url: "https://github.com/chinanf-boy/didact-explain" },
+      { name: "Element creation and JSX", url: "https://github.com/chinanf-boy/didact-explain" },
+      { name: "Instances and reconciliation", url: "https://github.com/chinanf-boy/didact-explain" },
+      { name: "Components and state", url: "https://github.com/chinanf-boy/didact-explain" }
+    ];
+
+    const appElement = {
+      type: "div",
+      props: {
+        children: [
+          {
+            type: "ul",
+            props: {
+              children: stories.map(storyElement)
+            }
+          }
+        ]
+      }
+    };
+
+    function storyElement({ name, url }) {
+      const likes = Math.ceil(Math.random() * 100);
+      const buttonElement = {
+        type: "button",
+        props: {
+          children: [
+            { type: "TEXT ELEMENT", props: { nodeValue: likes } },
+            { type: "TEXT ELEMENT", props: { nodeValue: "❤️" } }
+          ]
+        }
+      };
+      const linkElement = {
+        type: "a",
+        props: {
+          href: url,
+          children: [{ type: "TEXT ELEMENT", props: { nodeValue: name } }]
+        }
+      };
+
+      return {
+        type: "li",
+        props: {
+          children: [buttonElement, linkElement]
+        }
+      };
+    }
+
+    Didact.render(appElement, document.getElementById("root"));
+
+    /** ⬇️⬇️⬇️⬇️⬇️ 🌼Didact🌼 ⬇️⬇️⬇️⬇️⬇️ **/
+
+    function importFromBelow() {
+      function render(element, parentDom) {
+        const { type, props } = element; // 获取类型 和 属性对象
+        const isTextElement = type === "TEXT ELEMENT"; // 文本类型判定
+        const dom = isTextElement
+          ? document.createTextNode("") // 创建-类型-文本
+          : document.createElement(type); // 创建-类型-元素
+
+        const isListener = name => name.startsWith("on"); // 判断开头是否为on; 事件监听器;
+        Object.keys(props).filter(isListener).forEach(name => {
+          const eventType = name.toLocaleLowerCase().substring(2); // 取两位后
+          // 监听每一个开头为 on 的函数属性 并激活 props[name] 函数
+          dom.addEventListener(eventType, props[name])
+        })
+        // 判断 props 的值不为监听事件和子元素;
+        const isAttribute = name => !isListener(name) && name != "children";
+        // 过滤出来的属性赋值于 dom
+        Object.keys(props).filter(isAttribute).forEach(name => {
+          dom[name] = props[name];
+        });
+
+        const childElements = props.children || []; // 获取-子元素
+        childElements.forEach(childElement => { render(childElement, dom); }) // 递归子元素 将子元素加入当前元素中;
+        parentDom.appendChild(dom) // 将当前元素集合加入父级元素;
+      }
+
+      return {
+        render
+      };
+    }
+  </script>
+</body>
+
+</html>
