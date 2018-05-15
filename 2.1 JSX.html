@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>own react</title>
+</head>
+
+<body>
+  <p>上次我们介绍了Didact Elements，它是一种描述我们想要呈现给-DOM-的非常详细的方式{数据结构}。</p>
+  <p>在这篇文章中，我们将看到如何使用JSX来简化元素的创建。</p>
+  <p>JSX提供了一些语法糖来创建元素。以便代替：</p>
+  <pre>
+    const element = {
+      type: "div",
+      props: {
+        id: "container",
+        children: [
+          { type: "input", props: { value: "foo", type: "text" } },
+          {
+            type: "a",
+            props: {
+            href: "/bar",
+            children: [{ type: "TEXT ELEMENT", props: { nodeValue: "bar" } }]
+            }
+          },
+          {
+            type: "span",
+            props: {
+            onClick: e => alert("Hi"),
+            children: [{ type: "TEXT ELEMENT", props: { nodeValue: "click me" } }]
+            }
+          }
+        ]
+      }
+    };
+  </pre>
+  <p>我们的代码可以是</p>
+  <pre>
+    <span>const</span> <span>element</span> <span>=</span> (
+      <span>&lt;</span>div id<span>=</span><span><span>"</span>container<span>"</span></span><span>&gt;</span>
+        <span>&lt;</span>input value<span>=</span><span><span>"</span>foo<span>"</span></span> type<span>=</span><span><span>"</span>text<span>"</span></span> <span>/</span><span>&gt;</span>
+        <span>&lt;</span>a href<span>=</span><span><span>"</span>/bar<span>"</span></span><span>&gt;</span>bar<span>&lt;</span><span>/</span>a<span>&gt;</span>
+        <span>&lt;</span>span onClick<span>=</span>{<span>e</span> <span>=&gt;</span> <span>alert</span>(<span><span>"</span>Hi<span>"</span></span>)}<span>&gt;</span>click me<span>&lt;</span><span>/</span>span<span>&gt;</span>
+      <span>&lt;</span><span>/</span>div<span>&gt;</span>
+    );
+  </pre>
+  <p>如果你对JSX不熟悉，你可能会想知道最后一个片段是否是有效的javascript：它不是。</p>
+  <p>为了使浏览器的理解，需要的代码由预处理转化为-有效的JS，像babel了解更多关于JSX阅读这篇文章由贾森·米勒。</p>
+  <p>例如，babel从上面将JSX转换为：</p>
+  <pre>
+    const element = createElement(
+      "div",
+      { id: "container" },
+      createElement("input", { value: "foo", type: "text" }),
+      createElement(
+        "a",
+        { href: "/bar" },
+        "bar"
+      ),
+      createElement(
+        "span",
+        { onClick: e => alert("Hi") },
+        "click me"
+      )
+    );
+  </pre>
+  <p>我们需要添加到Didact中来支持JSX是一个createElement功能，这就是其余部分工作由-预处理器-完成的。</p>
+  <p>函数的第一个参数是type元素的第一个参数，第二个参数是元素的对象props，以及所有下面的参数children。</p>
+  <p>createElement需要创建一个props对象，将其分配给第二个参数中的所有值，将该children属性设置为第二个参数后面的所有参数，然后返回一个对象{} - 带有 {type, props }。把它放到代码中更容易：</p>
+  <pre>
+    function createElement(type, config, ...args) {
+      const props = Object.assign({}, config);// 合并
+      const hasChildren = args.length > 0; // 孩子？
+      props.children = hasChildren ? [].concat(...args) : [];
+      return { type, props }; // Didact元素的数据结构-类型{type}与属性{props}
+    }
+  </pre>
+  <p>除了一件事情之外，这个函数运行良好：文本元素。</p>
+  <p>文本-作为字符串-传递给createElement函数，Didact需要文本元素type以及props其余元素。</p>
+  <p>所以我们将每个arg转换为一个文本元素-一个规范的`Didact元素：</p>
+  <pre>
+    const TEXT_ELEMENT = "TEXT ELEMENT"; // 类型
+
+    function createElement(type, config, ...args) {
+      const props = Object.assign({}, config);
+      const hasChildren = args.length > 0;
+      const rawChildren = hasChildren ? [].concat(...args) : [];
+      props.children = rawChildren
+        .filter(c => c != null && c !== false)
+        .map(c => c instanceof Object ? c : createTextElement(c));
+        // 过滤-空-值, 剩下的-不属于-Object的值 -> createTextElement -> 变为 类型为TEXT_ELEMENT- Didact元素
+      return { type, props };
+    }
+    
+    function createTextElement(value) {
+      // 规范数据
+      return createElement(TEXT_ELEMENT, { nodeValue: value });
+    }
+  </pre>
+  <p>我还筛选了要排除的子项列表null，undefined并指出false.</p>
+  <p>我们不会呈现这些子项，因此不需要添加它们props.children。</p>
+  <a href="https://codepen.io/pomber/pen/xdmoWE?editors=0010">codepen</a>
+  <script>
+    /** @jsx Didact.createElement */
+    const Didact = importFromBelow();
+
+
+    /** ⬇️⬇️⬇️⬇️⬇️ 🌼Didact🌼 ⬇️⬇️⬇️⬇️⬇️ **/
+
+    function importFromBelow() {
+      const TEXT_ELEMENT = "TEXT ELEMENT";
+      function render(element, parentDom) {
+        const { type, props } = element;
+
+        // Create DOM element
+        const isTextElement = type === TEXT_ELEMENT;
+        const dom = isTextElement
+          ? document.createTextNode("")
+          : document.createElement(type);
+
+        // Add event listeners
+        const isListener = name => name.startsWith("on");
+        Object.keys(props).filter(isListener).forEach(name => {
+          const eventType = name.toLowerCase().substring(2);
+          dom.addEventListener(eventType, props[name]);
+        });
+
+        // Set properties
+        const isAttribute = name => !isListener(name) && name != "children";
+        Object.keys(props).filter(isAttribute).forEach(name => {
+          dom[name] = props[name];
+        });
+
+        // Render children
+        const childElements = props.children || [];
+        childElements.forEach(childElement => render(childElement, dom));
+
+        // Append to parent
+        parentDom.appendChild(dom);
+      }
+
+      function createElement(type, config, ...args) {
+        const props = Object.assign({}, config);
+        const hasChildren = args.length > 0;
+        const rawChildren = hasChildren ? [].concat(...args) : [];
+        props.children = rawChildren
+          .filter(c => c != null && c !== false)
+          .map(c => c instanceof Object ? c : createTextElement(c));
+        return { type, props };
+      }
+
+      function createTextElement(value) {
+        return createElement(TEXT_ELEMENT, { nodeValue: value });
+      }
+
+      return {
+        render,
+        createElement
+      };
+    }
+  </script>
+</body>
+
+</html>
