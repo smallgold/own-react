@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>own react</title>
+</head>
+
+<body>
+  <p>这个故事是我们一步一步构建自己版本的React的系列文章的一部分：</p>
+  <p>到目前为止，我们实现了一个基于JSX描述-创建dom元素的机制。在这篇文章中，我们将重点介绍如何更新DOM。</p>
+  <p>直到我们setState在后面的文章中介绍时，更新dom的唯一方法是使用不同的元素再次调用render函数（从第一篇文章开始）。例如，如果我们想渲染一个时钟，代码将是：</p>
+  <p><a href="https://codepen.io/pomber/pen/KmXeXr?editors=0010" target="_blank">>>> codepen.io</a></p>
+  <p>使用该函数的当前版本，这不起作用。而不是更新每个它相同的div 它会追加一个新的。</p>
+  <p>解决这个问题的第一种方法是替换每个更新的div。</p>
+  <p>在函数结束时，我们检查父项是否有任何子项，如果有，我们用新元素生成的dom替换它：rendertick-render</p>
+  <p>对于这个小例子，这个解决方案运行良好，但对于更复杂的情况，重新创建所有子节点的性能成本是不可接受的。所以我们需要一种方法来比较当前和前一次调用生成的元素树->render，并只更新差异。</p>
+  <p>捋一捋:</p>
+  <p>分清有-5-种名称</p>
+  <p>1. 真实-html-树</p>
+  <p>2. Didact 元素 {type, props}</p>
+  <p>3. 虚拟-Dom-树</p>
+  <p>3.1 虚拟-dom-元素 { dom, element, childInstance }</p>
+  <p>3.2 虚拟-组件-元素 { dom, element, childInstance, publicInstance }</p>
+</body>
+
+</html>
