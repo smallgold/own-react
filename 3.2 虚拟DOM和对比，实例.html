@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>own react</title>
+</head>
+
+<body>
+  <p>React称这种“差异化”进程调节。</p>
+  <p>对于我们来说，首先我们需要保留-先前渲染的树-，以便我们可以将它与-新树-进行比较。</p>
+  <p>换句话说，我们将维护我们自己的-DOM版本，一个虚拟的DOM。</p>
+  <p>什么应该是这个-虚拟DOM-中的“节点「node」”？</p>
+  <p>一种选择是只使用Didact Elements，它们已经有一个props.children属性，允许我们以树的形式导航它们。</p>
+  <p>但是有两个问题，</p>
+  <p>一个是我们需要在虚拟DOM的每个节点上保留一个对真实DOM节点的引用，以便使对比更容易，我们更愿意保持这些元素不变。</p>
+  <p>第二个问题是（稍后-下一章节）我们将需要支持具有自己状态的组件{Component}，并且元素无法处理它。</p>
+  <p>实例-Instance</p>
+  <p>所以我们需要引入一个新的术语：实例-Instance。</p>
+  <p>一个实例-表示已呈现-给DOM的元素。</p>
+  <p>它是具有三个属性的纯JS对象：element，dom，和childInstances。</p>
+  <p>element -> Didact 元素</p>
+  <p>dom -> html 元素</p>
+  <p>childInstances是一个包含元素-子元素实例的数组。</p>
+  <p>请注意，我们在这里引用的实例与Dan Abramov在React Components，Elements和Instances中使用的实例不同。他引用了公共实例，这是React在调用继承自类的构造函数时得到的React.Component。我们将在未来的帖子中将公开实例添加到Didact。</p>
+  <p>每个DOM节点都会有一个匹配的实例。协调算法的一个目标是尽可能避免-创建或删除实例。创建和删除实例意味着我们也将-修改DOM树，所以我们重新利用实例的次数越多，修改DOM树的次数越少。</p>
+</body>
+
+</html>
